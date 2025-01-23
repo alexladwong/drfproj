@@ -82,34 +82,34 @@ def register_view(request):
         # Basic validation
         if not all([email, password, password_confirm, first_name, last_name]):
             messages.error(request, 'All fields are required')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
         # Email validation
         try:
             validate_email(email)
         except ValidationError:
             messages.error(request, 'Please enter a valid email address')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
         # Check if email already exists
         User = get_user_model()
         if User.objects.filter(email=email).exists():
             messages.error(request, 'This email is already registered')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
         # Password validation
         if password != password_confirm:
             messages.error(request, 'Passwords do not match')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
         # Password strength validation
         if len(password) < 8:
             messages.error(request, 'Password must be at least 8 characters long')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
         if not re.match(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
             messages.error(request, 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
         try:
             # Create new user
@@ -143,10 +143,10 @@ def register_view(request):
                     'error': str(e)
                 })
             messages.error(request, f'An error occurred during registration: {str(e)}')
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
 
     # GET request - display registration form
-    return render(request, 'register.html')
+    return render(request, 'auth/register.html')
   
   
 
@@ -161,7 +161,7 @@ def login_view(request):
         
         if not email or not password:
             messages.error(request, 'Please provide both email and password')
-            return render(request, 'login.html')
+            return render(request, 'auth/login.html')
 
         user = authenticate(request, username=email, password=password)
 
@@ -173,7 +173,7 @@ def login_view(request):
                     request, 
                     f'Account is locked. Please try again in {lock_time_remaining.seconds//60} minutes'
                 )
-                return render(request, 'login.html')
+                return render(request, 'auth/login.html')
 
             # Get IP and location data
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -224,9 +224,9 @@ def login_view(request):
                 pass
 
             messages.error(request, 'Invalid email or password')
-            return render(request, 'login.html')
+            return render(request, 'auth/login.html')
 
-    return render(request, 'login.html')
+    return render(request, 'auth/login.html')
   
   
 
@@ -260,7 +260,7 @@ def password_reset_request(request):
             }
             
             # Render email templates
-            email_html_message = render_to_string('password_reset_email.html', context)
+            email_html_message = render_to_string('auth/password_reset_email.html', context)
             email_plaintext_message = strip_tags(email_html_message)
             
             try:
@@ -275,7 +275,7 @@ def password_reset_request(request):
                 )
                 messages.success(request, 
                     "Password reset instructions have been sent to your email.")
-                return redirect('login')
+                return redirect('/login')
                 
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
@@ -286,7 +286,7 @@ def password_reset_request(request):
             # We return success even if email doesn't exist for security
             return redirect('login')
     
-    return render(request, 'password_reset_form.html')
+    return render(request, 'auth/password_reset_form.html')
 
 def password_reset_confirm(request, uidb64, token):
     """
@@ -305,18 +305,18 @@ def password_reset_confirm(request, uidb64, token):
             
             if not password1 or not password2:
                 messages.error(request, "Please enter both passwords.")
-                return render(request, 'password_reset_confirm.html')
+                return render(request, 'auth/password_reset_confirm.html')
                 
             if password1 != password2:
                 messages.error(request, "The passwords don't match.")
-                return render(request, 'password_reset_confirm.html')
+                return render(request, 'auth/password_reset_confirm.html')
             
             try:
                 password_validation.validate_password(password1, user)
             except ValidationError as e:
                 for error in e.messages:
                     messages.error(request, error)
-                return render(request, 'password_reset_confirm.html')
+                return render(request, 'auth/password_reset_confirm.html')
             
             user.set_password(password1)
             user.login_attempts = 0
@@ -329,11 +329,11 @@ def password_reset_confirm(request, uidb64, token):
             messages.success(request, "Your password has been reset successfully.")
             return redirect('/')  # Redirect to home
             
-        return render(request, 'password_reset_confirm.html')
+        return render(request, 'auth/password_reset_confirm.html')
     else:
         messages.error(request, 
             "The password reset link is invalid or has expired. Please request a new one.")
-        return redirect('password_reset_request')
+        return redirect('auth/password_reset_request')
 
 
 def password_change(request):
@@ -350,18 +350,18 @@ def password_change(request):
         
         if not request.user.check_password(old_password):
             messages.error(request, "Your old password was entered incorrectly.")
-            return render(request, 'password_change.html')
+            return render(request, 'auth/password_change.html')
             
         if new_password1 != new_password2:
             messages.error(request, "The new passwords don't match.")
-            return render(request, 'password_change.html')
+            return render(request, 'auth/password_change.html')
             
         try:
             password_validation.validate_password(new_password1, request.user)
         except ValidationError as e:
             for error in e.messages:
                 messages.error(request, error)
-            return render(request, 'password_change.html')
+            return render(request, 'auth/password_change.html')
             
         request.user.set_password(new_password1)
         request.user.save()
@@ -370,7 +370,7 @@ def password_change(request):
         messages.success(request, "Your password was successfully changed.")
         return redirect('/')  # Redirect to home
         
-    return render(request, 'password_change.html')
+    return render(request, 'auth/password_change.html')
   
   
   
