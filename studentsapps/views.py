@@ -36,7 +36,7 @@ def home(request):
             'students': students,
             'redirect_url': '/'
         })
-    
+    messages.success(request, 'Welcome Back {{username}}')
     return render(request, 'home.html', {'students': students})
   
 
