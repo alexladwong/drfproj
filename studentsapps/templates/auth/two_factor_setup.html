@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 px-6">
+    <div class="max-w-md mx-auto">
+        <!-- Progress Steps -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="rounded-full h-8 w-8 flex items-center justify-center bg-indigo-600 text-white">1</div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900">Setup App</p>
+                    </div>
+                </div>
+                <div class="h-0.5 w-16 bg-gray-200"></div>
+                <div class="flex items-center">
+                    <div class="rounded-full h-8 w-8 flex items-center justify-center {% if verified %}bg-indigo-600{% else %}bg-gray-200{% endif %} text-{% if verified %}white{% else %}gray-400{% endif %}">2</div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900">Verify</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <!-- Security Notice Banner -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            Store your backup codes in a safe place. They'll help you regain access if you lose your authentication device.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold text-gray-900">Two-Factor Authentication</h2>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Protect your account with an additional layer of security
+                    </p>
+                </div>
+
+                {% if qr_image %}
+                <div class="mt-8">
+                    <div class="rounded-lg bg-gray-50 p-4">
+                        <div class="flex justify-center mb-4">
+                            <img src="{{ qr_image }}" alt="QR Code" class="h-48 w-48">
+                        </div>
+                        
+                        <div class="mt-4 space-y-3">
+                            <p class="text-sm text-gray-600">Can't scan the QR code? Use this code instead:</p>
+                            <div class="flex items-center justify-between bg-white rounded p-3">
+                                <code class="font-mono text-sm">{{ secret }}</code>
+                                <button onclick="copySecret('{{ secret }}')" class="text-indigo-600 hover:text-indigo-800">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <h3 class="text-sm font-medium text-gray-900">Setup Instructions:</h3>
+                        <ul class="mt-3 space-y-3">
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-5 w-5 text-green-500">✓</span>
+                                <span class="ml-2 text-sm text-gray-600">
+                                    Install an authenticator app (Google Authenticator, Authy, etc.)
+                                </span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-5 w-5 text-green-500">✓</span>
+                                <span class="ml-2 text-sm text-gray-600">
+                                    Scan the QR code or manually enter the secret key
+                                </span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-5 w-5 text-green-500">✓</span>
+                                <span class="ml-2 text-sm text-gray-600">
+                                    Enter the 6-digit code shown in your app
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Add this after QR code section -->
+                {% if backup_codes %}
+                <div class="mt-6">
+                    <h3 class="text-sm font-medium text-gray-900">Backup Codes</h3>
+                    <p class="text-sm text-gray-500 mt-1">Save these codes in a secure place</p>
+                    <div class="mt-2 grid grid-cols-2 gap-2">
+                        {% for code in backup_codes %}
+                        <div class="bg-gray-50 p-2 rounded text-mono text-sm">{{ code }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Verification Form -->
+                <form method="post" class="mt-8">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="rounded-md p-4 {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="space-y-4">
+                        <label for="code" class="block text-sm font-medium text-gray-700">
+                            Verification Code
+                        </label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <input type="text"
+                                   name="code"
+                                   id="code"
+                                   required
+                                   pattern="[0-9]*"
+                                   inputmode="numeric"
+                                   maxlength="6"
+                                   autocomplete="off"
+                                   class="block w-full pr-10 border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 pl-4 sm:text-lg"
+                                   placeholder="000000">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button type="submit"
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Verify and Enable 2FA
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copySecret(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // Show copy success message
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm';
+        toast.textContent = 'Secret copied to clipboard';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    });
+}
+
+// Auto-format verification code input
+document.getElementById('code').addEventListener('input', function(e) {
+    // Remove non-numeric characters
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+</script>
+{% endblock %}

@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # 'django_otp',
     # 'django_otp.plugins.otp_totp',
     # 'django_otp.plugins.otp_static',
-    # 'two_factor',
+    # ''django.contrib.sessions',
     
     # Django Frameworks
      'rest_framework',
@@ -53,6 +53,9 @@ INSTALLED_APPS = [
      'studentsapps',
      'api',
 ]
+
+# INSTALLED_APPS += ['django.contrib.sessions']
+# MIDDLEWARE += ['django.contrib.sessions.middleware.SessionMiddleware']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,6 +66,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'django_otp.middleware.OTPMiddleware',
+    
+    'django.contrib.sessions.middleware.SessionMiddleware',
 ]
 
 ROOT_URLCONF = 'django_resst_mainprj.urls'

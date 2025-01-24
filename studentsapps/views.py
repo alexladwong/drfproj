@@ -21,6 +21,9 @@ from django.contrib.auth import password_validation
   
 from django.contrib.auth import logout
 from .forms import UserUpdateForm, UserProfileUpdateForm
+import pyotp, qrcode
+import io, base64
+
 
 
 
@@ -29,16 +32,19 @@ def home(request):
     students = [
         {'id': 1, 'name': 'Alexander Joshua Ladwong', 'age': 10},
         {'id': 2, 'name': 'Alexander Shepard Otim', 'age': 7},
-        {'id': 3, 'name': 'Ladwong Alexander Chief', 'age': 2}
+        {'id': 3, 'name': 'Ladwong Alexander Chief', 'age': 2},
     ]
     
     if request.headers.get('Accept') == 'application/json':
         return JsonResponse({
             'success': True,
             'students': students,
-            'redirect_url': '/'
+            'redirect_url': '/',
         })
-    messages.success(request, 'Welcome Back {{username}}')
+    
+    # Display a welcome back message for logged-in users
+    messages.success(request, f'Welcome Back {request.user.first_name}')
+    
     return render(request, 'home.html', {'students': students})
   
 
@@ -229,6 +235,107 @@ def login_view(request):
             return render(request, 'auth/login.html')
 
     return render(request, 'auth/login.html')
+
+
+
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+import pyotp
+
+@login_required
+def TwoFactors(request):
+    # Generate new secret and QR code on each page load
+    secret = pyotp.random_base32()
+    backup_codes = [pyotp.random_base32()[:8] for _ in range(5)]
+    
+    totp = pyotp.TOTP(secret)
+    provisioning_uri = totp.provisioning_uri(
+        name=request.user.email,
+        issuer_name='StudentsApps'
+    )
+    
+    # Generate QR code
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(provisioning_uri)
+    qr.make(fit=True)
+    qr_image = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64
+    buffered = io.BytesIO()
+    qr_image.save(buffered)
+    qr_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+
+    # Store in session
+    request.session['temp_secret'] = secret
+    request.session['temp_backup_codes'] = backup_codes
+    
+    context = {
+        'qr_image': f'data:image/png;base64,{qr_image_base64}',
+        'secret': secret,
+        'backup_codes': backup_codes
+    }
+
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        if totp.verify(code, valid_window=1):
+            request.user.two_factor_secret = secret
+            request.user.two_factor_enabled = True
+            request.user.backup_codes = ','.join(backup_codes)
+            request.user.save()
+            messages.success(request, '2FA enabled successfully')
+            return redirect('/')
+        messages.error(request, 'Invalid verification code')
+
+    return render(request, 'auth/two_factor_setup.html', context)
+
+
+
+
+@login_required
+def generate_qr_code(request):
+   # Generate random secret key
+   secret = pyotp.random_base32()
+   
+   # Create TOTP object
+   totp = pyotp.TOTP(secret)
+   
+   # Generate QR code content
+   provisioning_uri = totp.provisioning_uri(
+       name=request.user.email,
+       issuer_name='StudentsApps'
+   )
+   
+   # Generate QR code image
+   qr = qrcode.QRCode(version=1, box_size=10, border=5)
+   qr.add_data(provisioning_uri)
+   qr.make(fit=True)
+   qr_image = qr.make_image(fill_color="black", back_color="white")
+   
+   # Convert QR code to base64 for display
+   buffered = io.BytesIO()
+   qr_image.save(buffered)
+   qr_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+   
+   context = {
+       'qr_image': f'data:image/png;base64,{qr_image_base64}',
+       'secret': secret,
+   }
+   
+   if request.method == 'POST':
+       code = request.POST.get('code')
+       # Verify provided code
+       if totp.verify(code):
+           request.user.two_factor_secret = secret
+           request.user.two_factor_enabled = True
+           request.user.save()
+           messages.success(request, '2FA enabled successfully')
+           return redirect('account')
+       else:
+           messages.error(request, 'Invalid verification code')
+   
+   return render(request, 'auth/two_factor_setup.html', context)
   
   
 
@@ -341,10 +448,10 @@ def password_reset_confirm(request, uidb64, token):
 # views.py
 @login_required
 def profile_view(request):
-    login_history = request.user.login_history.all()[:5]
     context = {
         'user': request.user,
-        'login_history': login_history,
+        'login_history': request.user.login_history.all()[:5],
+        'total_logins': request.user.login_history.count(),
     }
     return render(request, 'auth/profile.html', context)
 
@@ -372,8 +479,10 @@ def account_view(request):
         form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated successfully')
+            messages.success(request, 'Your profile has been updated successfully.')
             return redirect('account')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = UserProfileUpdateForm(instance=request.user)
     

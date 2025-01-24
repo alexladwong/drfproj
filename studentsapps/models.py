@@ -86,6 +86,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             ),
         ]
     )
+    
+    two_factor_secret = models.CharField(max_length=32, null=True, blank=True)
+    two_factor_enabled = models.BooleanField(default=False)
+    backup_codes = models.TextField(null=True, blank=True)
 
     # Personal information
     first_name = models.CharField(_('first name'), max_length=30, blank=True)

@@ -1,43 +1,150 @@
-{# templates/profile.html #}
 {% extends 'base.html' %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-100">
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="bg-white shadow rounded-lg">
+        <!-- Profile Overview -->
+        <div class="bg-white shadow rounded-lg mb-6">
             <div class="px-4 py-5 sm:p-6">
                 <div class="flex items-center space-x-5">
-                    <div class="h-20 w-20 rounded-full bg-indigo-600 flex items-center justify-center text-2xl text-white">
-                        {{ user.email|make_list|first|upper }}
-                    </div>
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Profile" class="h-24 w-24 rounded-full object-cover">
+                    {% else %}
+                        <div class="h-24 w-24 rounded-full bg-indigo-600 flex items-center justify-center text-3xl text-white">
+                            {{ user.first_name|make_list|first|default:user.email|make_list|first|upper }}
+                        </div>
+                    {% endif %}
                     <div>
-                        <h2 class="text-2xl font-bold">{{ user.get_full_name }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900">{{ user.get_full_name }}</h2>
                         <p class="text-gray-500">{{ user.email }}</p>
+                        <p class="text-sm text-gray-500 mt-1">Member since {{ user.date_joined|date:"F j, Y" }}</p>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="mt-6 border-t border-gray-200 pt-6">
-                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Personal Information -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+                    <dl class="space-y-4">
                         <div>
-                            <dt class="text-sm font-medium text-gray-500">First Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ user.first_name }}</dd>
+                            <dt class="text-sm font-medium text-gray-500">Full Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.get_full_name }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-500">Last Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ user.last_name }}</dd>
+                            <dt class="text-sm font-medium text-gray-500">Email</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.email }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Member Since</dt>
                             <dd class="mt-1 text-sm text-gray-900">{{ user.date_joined|date:"F j, Y" }}</dd>
                         </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Login Statistics -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Login Statistics</h3>
+                    <dl class="space-y-4">
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Last Login</dt>
                             <dd class="mt-1 text-sm text-gray-900">{{ user.last_login|date:"F j, Y H:i" }}</dd>
                         </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Total Logins</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.login_history.count }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Recent Location</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% with last_login=user.login_history.first %}
+                                    {% if last_login %}
+                                        {{ last_login.location_city }}{% if last_login.location_city and last_login.location_country %}, {% endif %}{{ last_login.location_country }}
+                                    {% else %}
+                                        No login history
+                                    {% endif %}
+                                {% endwith %}
+                            </dd>
+                        </div>
                     </dl>
                 </div>
             </div>
+
+            <!-- Security Settings -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Security Settings</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm font-medium text-gray-900">Two-Factor Authentication</div>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Not Enabled
+                                </span>
+                            </div>
+                            <a href="{% url 'two_factor_setup' %}" class="mt-2 inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500">
+                                Enable 2FA
+                                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">Password</div>
+                            <a href="{% url 'password_change' %}" class="mt-2 inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500">
+                                Change Password
+                                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Recent Login Activity -->
+        {% if user.login_history.exists %}
+        <div class="mt-6 bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Login Activity</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Browser</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for login in user.login_history.all|slice:":5" %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ login.login_datetime|date:"M d, Y H:i" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ login.location_city }}{% if login.location_city and login.location_country %}, {% endif %}{{ login.location_country }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ login.device_type }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ login.browser }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
