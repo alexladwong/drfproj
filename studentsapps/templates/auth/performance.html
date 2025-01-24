@@ -1,0 +1,42 @@
+{# templates/performance.html #}
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h2 class="text-lg font-medium text-gray-900">Performance Overview</h2>
+                
+                <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-lg">
+                        <div class="px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-gray-500 truncate">
+                                Total Logins
+                            </dt>
+                            <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                                {{ login_count }}
+                            </dd>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-lg">
+                        <div class="px-4 py-5 sm:p-6">
+                            <dt class="text-sm font-medium text-gray-500 truncate">
+                                Recent Locations
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% for location in last_locations %}
+                                <div class="mb-1">
+                                    {{ location.location_city }}{% if location.location_city and location.location_country %}, {% endif %}{{ location.location_country }}
+                                </div>
+                                {% endfor %}
+                            </dd>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

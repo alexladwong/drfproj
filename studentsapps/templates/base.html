@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} - Your Site Name</title>
+    <title>{% block title %}{% endblock %} - Django DRF</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +19,10 @@
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="/" class="text-xl font-bold text-indigo-600">Your Logo</a>
+                        <a href="/" class="text-xl font-bold text-indigo-600">
+                            <img src="{% static 'logo/logo-badge.png' %}"
+                            style="width: 60px;" alt="LOGO">
+                        </a>
                     </div>
                 </div>
 
@@ -57,7 +61,7 @@
     <footer class="bg-white mt-8">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <p class="text-center text-gray-500 text-sm">
-                &copy; {% now "Y" %} Your Company Name. All rights reserved.
+                &copy; {% now "Y" %} Django API DRF || All rights reserved.
             </p>
         </div>
     </footer>

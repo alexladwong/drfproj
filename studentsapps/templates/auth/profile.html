@@ -1,0 +1,43 @@
+{# templates/profile.html #}
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center space-x-5">
+                    <div class="h-20 w-20 rounded-full bg-indigo-600 flex items-center justify-center text-2xl text-white">
+                        {{ user.email|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">{{ user.get_full_name }}</h2>
+                        <p class="text-gray-500">{{ user.email }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t border-gray-200 pt-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">First Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.first_name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Last Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.last_name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Member Since</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.date_joined|date:"F j, Y" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Last Login</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ user.last_login|date:"F j, Y H:i" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

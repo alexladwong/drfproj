@@ -90,6 +90,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Personal information
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    profile_image = models.ImageField(upload_to='profile/', null=True, blank=True)
 
     # Status fields
     is_active = models.BooleanField(

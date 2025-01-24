@@ -20,6 +20,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import password_validation
   
 from django.contrib.auth import logout
+from .forms import UserUpdateForm, UserProfileUpdateForm
+
 
 
 @login_required(login_url='login')
@@ -336,6 +338,51 @@ def password_reset_confirm(request, uidb64, token):
         return redirect('auth/password_reset_request')
 
 
+# views.py
+@login_required
+def profile_view(request):
+    login_history = request.user.login_history.all()[:5]
+    context = {
+        'user': request.user,
+        'login_history': login_history,
+    }
+    return render(request, 'auth/profile.html', context)
+
+
+
+@login_required
+def performance_view(request):
+    login_count = request.user.login_history.count()
+    last_login = request.user.last_login
+    last_locations = request.user.login_history.values('location_city', 'location_country').distinct()[:5]
+    
+    context = {
+        'login_count': login_count,
+        'last_login': last_login,
+        'last_locations': last_locations,
+    }
+    return render(request, 'auth/performance.html', context)
+
+
+
+# views.py
+@login_required
+def account_view(request):
+    if request.method == 'POST':
+        form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully')
+            return redirect('account')
+    else:
+        form = UserProfileUpdateForm(instance=request.user)
+    
+    return render(request, 'auth/account.html', {'form': form})
+
+
+
+
+
 def password_change(request):
     """
     Handle password change for logged-in users
@@ -377,7 +424,7 @@ def password_change(request):
 # def TwoFactors(request):
 #   return
   
-  
+
 
 
 def logout_view(request):

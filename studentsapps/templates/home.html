@@ -2,114 +2,86 @@
 
 {% block title %}Home{% endblock %}
 
-
-
-
-
 {% block content %}
 <div class="min-h-screen bg-gray-100">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="px-4 py-6 sm:px-0">
-            <h1 class="text-3xl font-bold text-gray-900">Students List</h1>
-        </div>
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-indigo-600">StudentsApp</h1>
+                </div>
+                
+                <!-- User Dropdown Menu -->
+                <div class="relative ml-auto flex items-center">
+                    <button id="user-menu-button" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100">
+                        <span class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                            {{ user.email|make_list|first|upper }}
+                        </span>
+                        <span class="text-gray-700">{{ user.email }}</span>
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
 
-        <!-- Students Table -->
-        <div class="flex flex-col">
-            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Name
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Age
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                {% for student in students %}
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ student.id }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ student.name }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ student.age }}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div id="user-menu" class="hidden absolute right-0 top-12 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div class="py-1">
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                My Profile
+                            </a>
+                            <a href="{% url 'account' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Account Settings
+                            </a>
+                            <a href="{% url 'performance' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Performance
+                            </a>
+                            <form method="post" action="{% url 'logout' %}" class="block">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </nav>
 
-        <!-- Logout Button -->
-        <div class="mt-6 px-4 sm:px-0">
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Logout
-                </button>
-            </form>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Students Table Section -->
+        <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                <h2 class="text-xl font-semibold text-gray-900">Students List</h2>
+            </div>
+            
+            <!-- Your existing students table code -->
+            <div class="flex flex-col">
+                <!-- ... rest of your table code ... -->
+            </div>
         </div>
+
+        <!-- Login History Section -->
+        {% if user.login_history.all %}
+        <div class="bg-white shadow rounded-lg">
+            <!-- ... your existing login history code ... -->
+        </div>
+        {% endif %}
     </div>
 </div>
 
+<script>
+document.getElementById('user-menu-button').addEventListener('click', function(event) {
+    event.stopPropagation();
+    document.getElementById('user-menu').classList.toggle('hidden');
+});
 
-            <!-- Recent Login History -->
-            {% if user.login_history.all %}
-            <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
-                <div class="px-4 py-5 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        Recent Login Activity
-                    </h3>
-                </div>
-                <div class="border-t border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Date/Time
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Location
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Device
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {% for login in user.login_history.all|slice:":5" %}
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ login.login_datetime|date:"M d, Y H:i" }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ login.location_city }}{% if login.location_city and login.location_country %}, {% endif %}{{ login.location_country }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ login.device_type }} - {{ login.browser }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </main>
-</div>
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('user-menu');
+    if (!menu.contains(event.target) && !event.target.matches('#user-menu-button')) {
+        menu.classList.add('hidden');
+    }
+});
+</script>
 {% endblock %}
