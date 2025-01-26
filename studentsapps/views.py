@@ -24,6 +24,8 @@ from .forms import UserUpdateForm, UserProfileUpdateForm
 import pyotp, qrcode
 import io, base64
 
+from django.views.generic import TemplateView
+
 
 
 
@@ -553,3 +555,42 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have been successfully logged out.")
     return redirect('login')
+
+
+
+
+
+# GitHub Account
+class GitHubConnectView(TemplateView):
+    template_name = 'github_connect.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['github_connected'] = bool(self.request.user.github_token)
+        return context
+
+def github_login(request):
+    return redirect(
+        f'https://github.com/login/oauth/authorize?'
+        f'client_id={settings.GITHUB_CLIENT_ID}&'
+        f'redirect_uri={settings.GITHUB_REDIRECT_URI}&'
+        f'scope=repo user'
+    )
+
+def github_callback(request):
+    code = request.GET.get('code')
+    resp = requests.post(
+        'https://github.com/login/oauth/access_token',
+        data={
+            'client_id': settings.GITHUB_CLIENT_ID,
+            'client_secret': settings.GITHUB_CLIENT_SECRET,
+            'code': code
+        },
+        headers={'Accept': 'application/json'}
+    )
+    
+    access_token = resp.json().get('access_token')
+    request.user.github_token = access_token
+    request.user.save()
+    
+    return redirect('github_connect')

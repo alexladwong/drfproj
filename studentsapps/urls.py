@@ -16,4 +16,9 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('account/', views.account_view, name='account'),
     path('performance/', views.performance_view, name='performance'),
+    
+    
+    path('github/connect/', views.GitHubConnectView.as_view(), name='github_connect'),
+    path('github/login/', views.github_login, name='github_login'),
+    path('github/callback/', views.github_callback, name='github_callback'),
 ]
