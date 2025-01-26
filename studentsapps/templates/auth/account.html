@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+{% include "Dropdown.html" %}
+
+
 <div class="min-h-screen bg-gray-100">
    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
        <!-- Messages -->
@@ -104,8 +108,8 @@
 
            <!-- Main Content -->
            <div class="mt-5 md:mt-0 md:col-span-2">
-               <form method="post" enctype="multipart/form-data">
-                   {% csrf_token %}
+                <form method="post" enctype="multipart/form-data" id="profile-form">
+                    {% csrf_token %}
                    <div class="shadow overflow-hidden sm:rounded-lg">
                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                            <!-- Profile Photo Section -->

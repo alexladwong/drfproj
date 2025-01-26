@@ -1,0 +1,75 @@
+{% block content %}
+
+
+<nav class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            
+            <div class="relative ml-auto flex items-center">
+                <button id="user-menu-button" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100">
+                    {% if user.profile_image %}
+                        <img class="h-8 w-8 rounded-full object-cover" src="{{ user.profile_image.url }}" alt="">
+                    {% else %}
+                        <span class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                            {{ user.email|make_list|first|upper }}
+                        </span>
+                    {% endif %}
+                    <span class="text-gray-700">{{ user.email }}</span>
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div id="user-menu" class="hidden absolute right-0 top-12 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div class="py-1">
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            My Profile
+                        </a>
+                        <a href="{% url 'account' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Account Settings
+                        </a>
+                        <a href="{% url 'performance' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Performance
+                        </a>
+                        <form method="post" action="{% url 'logout' %}" class="block">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Dropdown functionality
+    document.getElementById('user-menu-button').addEventListener('click', function(event) {
+        event.stopPropagation();
+        document.getElementById('user-menu').classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('user-menu');
+        if (!menu.contains(event.target) && !event.target.matches('#user-menu-button')) {
+            menu.classList.add('hidden');
+        }
+    });
+
+    // Messages auto-hide
+    document.addEventListener('DOMContentLoaded', function() {
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) {
+            setTimeout(() => {
+                messagesContainer.style.transition = 'opacity 0.5s ease-out';
+                messagesContainer.style.opacity = '0';
+                setTimeout(() => messagesContainer.remove(), 500);
+            }, 5000);
+        }
+    });
+</script>
+
+
+{% endblock  %}
