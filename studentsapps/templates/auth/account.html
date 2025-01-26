@@ -259,30 +259,130 @@
 </div>
 
 <script>
-// Image preview
-document.getElementById('profile_image').addEventListener('change', function(e) {
-    if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        const img = document.querySelector('img') || document.createElement('img');
-        
-        reader.onload = function(e) {
-            img.src = e.target.result;
-            img.classList.add('h-full', 'w-full', 'object-cover');
-            const placeholder = document.querySelector('.flex.items-center.justify-center');
-            if (placeholder) {
-                placeholder.parentNode.replaceChild(img, placeholder);
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('profile-form');
+        const submitButton = form.querySelector('button[type="submit"]');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const profileImage = document.querySelector('.h-24.w-24 img');
+        const profileInitial = document.querySelector('.h-24.w-24 div');
+    
+        // Handle file input change
+        document.getElementById('profile_image').addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (profileImage) {
+                        profileImage.src = e.target.result;
+                    } else if (profileInitial) {
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.className = 'h-full w-full object-cover';
+                        profileInitial.parentNode.replaceChild(newImg, profileInitial);
+                    }
+                };
+                reader.readAsDataURL(this.files[0]);
             }
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-});
-
-// Form submission
-document.querySelector('form').addEventListener('submit', function() {
-    const button = this.querySelector('button[type="submit"]');
-    const spinner = document.getElementById('loading-spinner');
-    button.disabled = true;
-    spinner.classList.remove('hidden');
-});
-</script>
+        });
+    
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            submitButton.disabled = true;
+            loadingSpinner.classList.remove('hidden');
+            submitButton.classList.add('opacity-75');
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const messageHtml = `
+                        <div class="p-4 rounded-lg border flex items-center bg-green-50 border-green-200 text-green-700">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium">Changes saved successfully!</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    let messagesContainer = document.getElementById('messages-container');
+                    if (!messagesContainer) {
+                        messagesContainer = document.createElement('div');
+                        messagesContainer.id = 'messages-container';
+                        messagesContainer.className = 'space-y-2';
+                        form.parentNode.insertBefore(messagesContainer, form);
+                    }
+                    messagesContainer.innerHTML = messageHtml;
+                    
+                    setTimeout(() => {
+                        messagesContainer.style.transition = 'opacity 0.5s ease-out';
+                        messagesContainer.style.opacity = '0';
+                        setTimeout(() => messagesContainer.remove(), 500);
+                    }, 5000);
+                    
+                    if (data.user) {
+                        Object.keys(data.user).forEach(key => {
+                            if (key === 'profile_image') {
+                                if (profileImage && data.user[key]) {
+                                    profileImage.src = data.user[key];
+                                }
+                            } else {
+                                const input = form.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    if (input.type === 'checkbox') {
+                                        input.checked = data.user[key];
+                                    } else if (input.type !== 'file') {
+                                        input.value = data.user[key];
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    throw new Error(data.message || 'Failed to save changes');
+                }
+            } catch (error) {
+                const errorHtml = `
+                    <div class="p-4 rounded-lg border flex items-center bg-red-50 border-red-200 text-red-700">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                
+                let messagesContainer = document.getElementById('messages-container');
+                if (!messagesContainer) {
+                    messagesContainer = document.createElement('div');
+                    messagesContainer.id = 'messages-container';
+                    messagesContainer.className = 'space-y-2';
+                    form.parentNode.insertBefore(messagesContainer, form);
+                }
+                messagesContainer.innerHTML = errorHtml;
+            } finally {
+                submitButton.disabled = false;
+                loadingSpinner.classList.add('hidden');
+                submitButton.classList.remove('opacity-75');
+            }
+        });
+    });
+    </script>
 {% endblock %}

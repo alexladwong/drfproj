@@ -478,14 +478,27 @@ def account_view(request):
     if request.method == 'POST':
         form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('account')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = UserProfileUpdateForm(instance=request.user)
+            user = form.save()
+            return JsonResponse({
+                'success': True,
+                'user': {
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'email': user.email,
+                    'notify_on_login': user.notify_on_login,
+                    'notify_on_suspicious_login': user.notify_on_suspicious_login,
+                    'profile_image': user.profile_image.url if user.profile_image else None
+                }
+            })
+        
+        # Return form errors if validation fails
+        return JsonResponse({
+            'success': False,
+            'message': 'Please correct the errors below.',
+            'errors': {field: errors[0] for field, errors in form.errors.items()}
+        }, status=400)
     
+    form = UserProfileUpdateForm(instance=request.user)
     return render(request, 'auth/account.html', {'form': form})
 
 
