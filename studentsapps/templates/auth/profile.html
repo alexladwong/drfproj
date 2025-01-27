@@ -67,13 +67,24 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Recent Location</dt>
                             <dd class="mt-1 text-sm text-gray-900">
-                                {% with last_location=user.login_history.first.location_city %}
-                                {% if last_location %}
-                                    {{ last_location }}{% if user.login_history.first.location_country %}, {{ user.login_history.first.location_country }}{% endif %}
-                                {% else %}
-                                    No login history
-                                {% endif %}
-                            {% endwith %}
+                                {% with recent_login=user.login_history.all|first %}
+                                    {% if recent_login.latitude and recent_login.longitude %}
+                                        {{ recent_login.latitude }}, {{ recent_login.longitude }}
+                                    {% else %}
+                                        Unknown coordinates
+                                    {% endif %}
+                                {% endwith %}
+                            </dd>
+                            <dd class="mt-1 text-sm text-gray-900">
+                               <span>Status: </span> {% if login.is_suspicious %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                <span>Status: </span>     Suspicious
+                                </span>
+                            {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Normal
+                                </span>
+                            {% endif %}
                             </dd>
                         </div>
                     </dl>

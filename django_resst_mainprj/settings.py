@@ -158,7 +158,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kintuale@gmail.com'
 EMAIL_HOST_PASSWORD = 'ufwnvbxgzmynbjpi'
 DEFAULT_FROM_EMAIL = 'Students Systems <kintuale@gmail.com>'
-SITE_URL = 'http://127.0.0.1:8000'  # Change in production
+SITE_URL = 'http://127.0.0.1:*'  # Change in production
 SUPPORT_EMAIL = 'umd.developers@gmail.com'
 
 # IP Geolocation settings
@@ -172,6 +172,14 @@ CACHES = {
     }
 }
 NOMINATIM_USER_AGENT = "studentsapps" 
+
+
+
+
+
+GITHUB_CLIENT_ID = '81810294'
+GITHUB_CLIENT_SECRET = 'MDQ6VXNlcjgxODEwMjk0'
+GITHUB_REDIRECT_URI = 'https://api.github.com/users/alexladwong'
 
 
 
