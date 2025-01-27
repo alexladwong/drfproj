@@ -12,6 +12,12 @@
                     <h1 class="text-2xl font-bold text-indigo-600">StudentsApp</h1>
                 </div>
                 
+                <!-- Display Date and Time -->
+                <div class="flex items-center text-gray-600 text-sm ml-auto">
+                    <p>Today is: <span class="font-medium">{{ current_time|date:"F j, Y" }}</span></p>
+                    <p class="ml-4">Current Time: <span class="font-medium">{{ current_time|date:"g:i a" }}</span></p>
+                </div>
+
                 <!-- User Dropdown Menu -->
                 <div class="relative ml-auto flex items-center">
                     <button id="user-menu-button" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100">
@@ -24,6 +30,7 @@
                         </svg>
                     </button>
 
+                    <!-- Dropdown Menu -->
                     <div id="user-menu" class="hidden absolute right-0 top-12 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                         <div class="py-1">
                             <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -48,53 +55,34 @@
         </div>
     </nav>
 
-
-                <!-- Messages -->
-                {% if messages %}
-                <div id="messages-container" class="space-y-2">
-                    {% for message in messages %}
-                    <div class="p-4 rounded-lg border flex items-center 
-                        {% if 'error' in message.tags %}
-                            bg-red-50 border-red-200 text-red-700
-                        {% else %}
-                            bg-green-50 border-green-200 text-green-700
-                        {% endif %}">
-                        <div class="flex-shrink-0">
-                            {% if 'error' in message.tags %}
-                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
-                            </svg>
-                            {% else %}
-                            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
-                            </svg>
-                            {% endif %}
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium">{{ message }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-
-<!-- JavaScript to auto-hide messages -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Select the messages container
-        const messagesContainer = document.getElementById('messages-container');
-        if (messagesContainer) {
-            // Set timeout to hide messages after 5 seconds (5000 ms)
-            setTimeout(() => {
-                messagesContainer.style.transition = 'opacity 0.5s ease-out';
-                messagesContainer.style.opacity = '0';
-                setTimeout(() => messagesContainer.remove(), 500); // Remove the element after fade-out
-            }, 5000);
-        }
-    });
-</script>
-{% endif %}
-
-
+    <!-- Messages -->
+    {% if messages %}
+    <div id="messages-container" class="space-y-2">
+        {% for message in messages %}
+        <div class="p-4 rounded-lg border flex items-center 
+            {% if 'error' in message.tags %}
+                bg-red-50 border-red-200 text-red-700
+            {% else %}
+                bg-green-50 border-green-200 text-green-700
+            {% endif %}">
+            <div class="flex-shrink-0">
+                {% if 'error' in message.tags %}
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+                </svg>
+                {% else %}
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                </svg>
+                {% endif %}
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium">{{ message }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -104,31 +92,67 @@
                 <h2 class="text-xl font-semibold text-gray-900">Students List</h2>
             </div>
             
-            <!-- Your existing students table code -->
             <div class="flex flex-col">
-                <!-- ... rest of your table code ... -->
+                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {% for student in students %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.id }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ student.name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.age }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not students %}
+                                    <tr>
+                                        <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">No students available.</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- Login History Section -->
-        {% if user.login_history.all %}
-        <div class="bg-white shadow rounded-lg">
-            <!-- ... your existing login history code ... -->
-        </div>
-        {% endif %}
     </div>
 </div>
 
 <script>
-document.getElementById('user-menu-button').addEventListener('click', function(event) {
-    event.stopPropagation();
-    document.getElementById('user-menu').classList.toggle('hidden');
-});
+document.addEventListener('DOMContentLoaded', function() {
+    // Dropdown menu toggle
+    const userMenuButton = document.getElementById('user-menu-button');
+    const userMenu = document.getElementById('user-menu');
+    
+    userMenuButton.addEventListener('click', function(event) {
+        event.stopPropagation();  // Prevents closing the menu immediately when the button is clicked
+        userMenu.classList.toggle('hidden');  // Toggle visibility of the menu
+    });
 
-document.addEventListener('click', function(event) {
-    const menu = document.getElementById('user-menu');
-    if (!menu.contains(event.target) && !event.target.matches('#user-menu-button')) {
-        menu.classList.add('hidden');
+    document.addEventListener('click', function(event) {
+        // Close the menu if the click is outside the dropdown
+        if (!userMenu.contains(event.target) && !userMenuButton.contains(event.target)) {
+            userMenu.classList.add('hidden');  // Hide the menu when clicking outside
+        }
+    });
+
+    // Auto-hide messages after 5 seconds
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        setTimeout(() => {
+            messagesContainer.style.transition = 'opacity 0.5s ease-out';
+            messagesContainer.style.opacity = '0';
+            setTimeout(() => messagesContainer.remove(), 500); // Remove after fade-out
+        }, 5000);
     }
 });
 </script>

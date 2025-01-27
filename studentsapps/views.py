@@ -25,8 +25,7 @@ import pyotp, qrcode
 import io, base64
 
 from django.views.generic import TemplateView
-
-
+from datetime import datetime
 
 
 @login_required(login_url='login')
@@ -36,18 +35,23 @@ def home(request):
         {'id': 2, 'name': 'Alexander Shepard Otim', 'age': 7},
         {'id': 3, 'name': 'Ladwong Alexander Chief', 'age': 2},
     ]
+
+    current_time = datetime.now()  # Get the current date and time
     
     if request.headers.get('Accept') == 'application/json':
         return JsonResponse({
             'success': True,
             'students': students,
             'redirect_url': '/',
+            'timestamp': current_time.isoformat(),
         })
-    
+
     # Display a welcome back message for logged-in users
-    messages.success(request, f'Welcome Back {request.user.first_name}')
-    
-    return render(request, 'home.html', {'students': students})
+    messages.success(request, f'Welcome Back {request.user.first_name or "User"}')
+
+    # Pass the current time to the template
+    return render(request, 'home.html', {'students': students, 'current_time': current_time})
+
   
 
 @ensure_csrf_cookie
