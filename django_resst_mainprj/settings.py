@@ -191,7 +191,7 @@ GITHUB_REDIRECT_URI = 'https://api.github.com/users/alexladwong'
 JAZZMIN_SETTINGS = {
     'site_header': "DRF API's",
     'site_brand': "",
-    'site_logo': "/assets/images/logo.png",
+    'site_logo': "/logo/logo-badge.png",
     'copyright':  "All Right Reserved 2025",
     "welcome_sign": "Welcome to DRF API's, Login Now.",
     "topmenu_links": [
