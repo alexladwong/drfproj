@@ -115,7 +115,11 @@ def StudentDetailsView(request, pk):
 #         except IntegrityError:
 #             return Response({"error": "Cannot delete employee with related records"}, status=status.HTTP_400_BAD_REQUEST)
         
-              
+
+
+
+""" 
+# Mixins    
 class Employees(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -127,7 +131,9 @@ class Employees(mixins.ListModelMixin, mixins.CreateModelMixin, generics.Generic
     # Post Employee
     def post(self, request):
         return self.create(request)
-    
+ 
+ 
+# Mixins    
 # EmployeeDetails
 class EmployeeDetails(mixins.RetrieveModelMixin, 
                       mixins.UpdateModelMixin, 
@@ -147,9 +153,27 @@ class EmployeeDetails(mixins.RetrieveModelMixin,
     # Destroy Employee Details
     def delete(self, request, pk):
         return self.destroy(request, pk)
+"""
         
+
+# Class-Based GenericViews
+class Employees(generics.ListCreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
     
+
+
+
+
+class EmployeeDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    lookup_field = 'pk' # pk is optional
     
+
+
+
+
              
 
     

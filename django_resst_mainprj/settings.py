@@ -158,7 +158,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kintuale@gmail.com'
 EMAIL_HOST_PASSWORD = 'ufwnvbxgzmynbjpi'
-DEFAULT_FROM_EMAIL = 'Students Systems <kintuale@gmail.com>'
+DEFAULT_FROM_EMAIL = 'ConCommunity <kintuale@gmail.com>'
 SITE_URL = 'http://127.0.0.1:*'  # Change in production
 SUPPORT_EMAIL = 'umd.developers@gmail.com'
 
@@ -203,17 +203,6 @@ JAZZMIN_SETTINGS = {
         {"model": "AUTH_USER_MODEL.User"},
     ],
 
-    # "order_with_respect_to": [
-    #     "hotel",
-    #     "hotel.Hotel",
-    #     "hotel.Room",
-    #     "hotel.Booking",
-    #     "hotel.BookingDetail",
-    #     "hotel.Guest",
-    #     "hotel.RoomServices",
-    #     "userauths"
-    #     "addons",
-    # ],
     "icons": {
         "admin.LogEntry": "fas fa-admin",
         
