@@ -221,7 +221,21 @@ class CommentsView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     
 
-        
+
+# BlogDetailView
+class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = 'pk' # pk is optional
+    
+    
+
+
+# CommentDetailView
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'pk' # pk is optional
     
         
     
