@@ -1,6 +1,7 @@
 from django.shortcuts import render,  get_object_or_404
 from django.http import JsonResponse
 
+from blogapp.models import Blog, Comment
 from employee.models import Employee
 from studentsapps.models import Student
 from .serializers import EmployeeSerializer, StudentSerializer
@@ -10,6 +11,9 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from django.db import IntegrityError
 from rest_framework import mixins, generics, viewsets
+from django.shortcuts import get_object_or_404
+from blogapp.serializers import BlogSerializer, CommentSerializer
+
 
 # Create your views here.
 @api_view(['GET', 'POST'])
@@ -204,6 +208,18 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     serializer_class = EmployeeSerializer
     # lookup_field = 'pk' # pk is optional
 
+
+# Blogs 
+class BlogView(generics.ListCreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    
+    
+# CommentsView
+class CommentsView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    
 
         
     

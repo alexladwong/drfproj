@@ -10,6 +10,13 @@ class Blog(models.Model):
     def __str__(self):
         return self.blog_title
     
+    class Meta:
+        db_table = ''
+        managed = True
+        verbose_name = 'Blog'
+        verbose_name_plural = 'Blogs'
+        ordering = ['-created_at']
+    
 class Comment(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='comments')
     comment = models.TextField()
@@ -17,5 +24,11 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"Comment on {self.blog.blog_title}"
+    class Meta:
+        db_table = ''
+        managed = True
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+        ordering = ['-created_at']
     
 
