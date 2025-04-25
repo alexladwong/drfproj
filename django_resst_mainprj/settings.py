@@ -52,6 +52,7 @@ INSTALLED_APPS = [
      'studentsapps',
      'api',
      'employee',
+     'blogapp',
 ]
 
 # INSTALLED_APPS += ['django.contrib.sessions']
